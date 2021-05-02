@@ -5,7 +5,7 @@ from leroy_merlen.leroy_parser.items import LeroyParserItem
 
 class LeroyMerlenSpider(scrapy.Spider):
     name = 'leroy_merlen'
-    allowed_domains = ['naberezhnye-chelny.leroymerlin.ru']
+    allowed_domains = ['https://naberezhnye-chelny.leroymerlin.ru']
     # start_urls = ['https://naberezhnye-chelny.leroymerlin.ru']
 
     def __init__(self, answer):
@@ -15,6 +15,10 @@ class LeroyMerlenSpider(scrapy.Spider):
         self.start_urls = [url]
 
 
-    def parse(self, response):
-        print(self.start_urls)
-        pass
+    def parse(self, response: HtmlResponse):
+        links = set(response.xpath('//div[contains(@class, "largeCard")]/a/@href').getall())
+
+        for link in links:
+            print(1)
+            yield response.follow(self.allowed_domains + link, callback=self.process_link)
+
