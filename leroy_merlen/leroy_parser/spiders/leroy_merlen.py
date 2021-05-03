@@ -1,5 +1,6 @@
 import scrapy
 from scrapy.http import HtmlResponse
+from scrapy.loader import ItemLoader
 from leroy_merlen.leroy_parser.items import LeroyParserItem
 
 
@@ -24,6 +25,12 @@ class LeroyMerlenSpider(scrapy.Spider):
 
 
     def process_link(self, response: HtmlResponse):
+        loader = ItemLoader(item=LeroyParserItem())
+
+
+
+
+        # standart metod
         name = response.xpath('//h1/text()').get()
         url = response.url
         #      rate = response.xpath('//div[@id="rate"]/text()').get()
@@ -31,20 +38,11 @@ class LeroyMerlenSpider(scrapy.Spider):
         #      data_cost = response.xpath('//div[contains(@class, "buying-price")]/span/text()').getall()
         params_name = response.xpath('//section[@id = "nav-characteristics"]//div//dt//text()').getall()
         params_value = response.xpath('//section[@id = "nav-characteristics"]//div//dd//text()').getall()
+        photo_urls = response.xpath('//picture[@slot = "pictures"]//source/@data-origin')
         item = LeroyParserItem()
         item['name'] = name
         item['url'] = url
         item['params_name'] = params_name
         item['params_value'] = params_value
-
-
         print(1)
-        # item['param'] = params
-
-        #      item['url'] = response.url
-        #      item['name'] = name
-        #      item['rate'] = rate
-        #      item['authors'] = authors
-        #      item['data_cost'] = data_cost
-        #
         yield item
