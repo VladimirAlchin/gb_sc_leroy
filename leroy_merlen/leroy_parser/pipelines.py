@@ -5,10 +5,12 @@
 
 
 # useful for handling different item types with a single interface
+import scrapy
 from itemadapter import ItemAdapter
 from pymongo import MongoClient
 from scrapy.http import HtmlResponse
-# pip install pillow
+from scrapy.pipelines.images import ImagesPipeline
+
 
 class LeroyParserPipeline:
     def __init__(self):
@@ -16,14 +18,25 @@ class LeroyParserPipeline:
         self.db = self.client['leroy']
 
     def process_item(self, item, spider):
-
         print(1)
-        item['params_value'] = list(map(str.strip, item['params_value']))
         item['all_params'] = dict(zip(item['params_name'], item['params_value']))
 
         del item['params_name'], item['params_value']
-
+        print(1)
         return item
 
 
-from scrapy.pipelines.images import ImagesPipeline
+class LeroyImagePipeline(ImagesPipeline):
+    def get_media_requests(self, item, info):
+        print(1)
+        if item['photos']:
+            for img in item['photos']:
+                try:
+                    yield scrapy.Request(img)
+                except Exception as e:
+                    print(e)
+
+    def item_completed(self, results, item, info):
+        print(1)
+
+        return item

@@ -28,10 +28,12 @@ class LeroyMerlenSpider(scrapy.Spider):
         loader = ItemLoader(item=LeroyParserItem(), response=response)
         loader.add_xpath("name", '//h1/text()')
         loader.add_xpath('photos', '//picture[@slot = "pictures"]//source/@data-origin')
-
-
-
-
+        loader.add_value('url', response.url)
+        loader.add_xpath('params_name', '//section[@id = "nav-characteristics"]//div//dt//text()')
+        loader.add_xpath('params_value', '//section[@id = "nav-characteristics"]//div//dd//text()')
+        loader.add_xpath('cost', '//span[@slot="price"]/text()')
+        loader.add_xpath('currency', '//span[@slot="currency"]/text()')
+        loader.add_xpath('unit', '//span[@slot="unit"]/text()')
 
         # standart metod
         # name = response.xpath('//h1/text()').get()
