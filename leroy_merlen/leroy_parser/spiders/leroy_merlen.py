@@ -8,32 +8,34 @@ class LeroyMerlenSpider(scrapy.Spider):
     name = 'leroy_merlen'
     allowed_domains = ['naberezhnye-chelny.leroymerlin.ru']
     url_dom = ['https://naberezhnye-chelny.leroymerlin.ru']
-    # start_urls = ['https://naberezhnye-chelny.leroymerlin.ru']
+
+
 
     def __init__(self, answer):
         super().__init__()
         url = f'https://naberezhnye-chelny.leroymerlin.ru/search/?q={answer}'
-        # url = 'https://naberezhnye-chelny.leroymerlin.ru/search/?q=%D1%80%D0%B0%D0%B4%D0%B8%D0%B0%D1%82%D0%BE%D1%80'
+
         self.start_urls = [url]
 
     def parse(self, response: HtmlResponse):
         links = set(response.xpath('//div[contains(@class, "largeCard")]/a/@href').getall())
 
         for link in links:
-            # print(1)
             yield response.follow(self.url_dom[0] + link, callback=self.process_link)
+
 
 
     def process_link(self, response: HtmlResponse):
         loader = ItemLoader(item=LeroyParserItem(), response=response)
         loader.add_xpath("name", '//h1/text()')
-        loader.add_xpath('photos', '//picture[@slot = "pictures"]//source/@data-origin')
+        loader.add_xpath('photos', '//img[contains(@slot,"thumbs")]/@src')
         loader.add_value('url', response.url)
         loader.add_xpath('params_name', '//section[@id = "nav-characteristics"]//div//dt//text()')
         loader.add_xpath('params_value', '//section[@id = "nav-characteristics"]//div//dd//text()')
         loader.add_xpath('cost', '//span[@slot="price"]/text()')
         loader.add_xpath('currency', '//span[@slot="currency"]/text()')
         loader.add_xpath('unit', '//span[@slot="unit"]/text()')
+        loader.add_value('article', response.url.split('-')[-1].replace('/', ''))
 
         # standart metod
         # name = response.xpath('//h1/text()').get()

@@ -13,22 +13,23 @@ from scrapy.pipelines.images import ImagesPipeline
 
 
 class LeroyParserPipeline:
+
     def __init__(self):
         self.client = MongoClient('localhost:27017')
-        self.db = self.client['leroy']
+        self.db = self.client['gb_parser']
 
     def process_item(self, item, spider):
-        print(1)
         item['all_params'] = dict(zip(item['params_name'], item['params_value']))
-
         del item['params_name'], item['params_value']
+
+        self.db[spider.name].update_one({'article': {'$eq': item['article']}}, {'$set': item}, upsert=True)
         print(1)
+
         return item
 
 
 class LeroyImagePipeline(ImagesPipeline):
     def get_media_requests(self, item, info):
-        print(1)
         if item['photos']:
             for img in item['photos']:
                 try:
@@ -37,6 +38,6 @@ class LeroyImagePipeline(ImagesPipeline):
                     print(e)
 
     def item_completed(self, results, item, info):
-        print(1)
-
+        if results:
+            item["photos"] = [itm[1] for itm in results if itm[0]]
         return item
