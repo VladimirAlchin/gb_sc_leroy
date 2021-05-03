@@ -25,24 +25,28 @@ class LeroyMerlenSpider(scrapy.Spider):
 
 
     def process_link(self, response: HtmlResponse):
-        loader = ItemLoader(item=LeroyParserItem())
+        loader = ItemLoader(item=LeroyParserItem(), response=response)
+        loader.add_xpath("name", '//h1/text()')
+        loader.add_xpath('photos', '//picture[@slot = "pictures"]//source/@data-origin')
+
 
 
 
 
         # standart metod
-        name = response.xpath('//h1/text()').get()
-        url = response.url
-        #      rate = response.xpath('//div[@id="rate"]/text()').get()
-        #      authors = response.xpath('//div[@class="authors"]/a/text()').getall()
-        #      data_cost = response.xpath('//div[contains(@class, "buying-price")]/span/text()').getall()
-        params_name = response.xpath('//section[@id = "nav-characteristics"]//div//dt//text()').getall()
-        params_value = response.xpath('//section[@id = "nav-characteristics"]//div//dd//text()').getall()
-        photo_urls = response.xpath('//picture[@slot = "pictures"]//source/@data-origin')
-        item = LeroyParserItem()
-        item['name'] = name
-        item['url'] = url
-        item['params_name'] = params_name
-        item['params_value'] = params_value
-        print(1)
-        yield item
+        # name = response.xpath('//h1/text()').get()
+        # url = response.url
+        # #      rate = response.xpath('//div[@id="rate"]/text()').get()
+        # #      authors = response.xpath('//div[@class="authors"]/a/text()').getall()
+        # #      data_cost = response.xpath('//div[contains(@class, "buying-price")]/span/text()').getall()
+        # params_name = response.xpath('//section[@id = "nav-characteristics"]//div//dt//text()').getall()
+        # params_value = response.xpath('//section[@id = "nav-characteristics"]//div//dd//text()').getall()
+        # photo_urls = response.xpath('//picture[@slot = "pictures"]//source/@data-origin')
+        # item = LeroyParserItem()
+        # item['name'] = name
+        # item['url'] = url
+        # item['params_name'] = params_name
+        # item['params_value'] = params_value
+        # print(1)
+        # yield item
+        yield loader.load_item()

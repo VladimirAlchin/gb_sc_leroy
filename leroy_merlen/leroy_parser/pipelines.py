@@ -8,7 +8,7 @@
 from itemadapter import ItemAdapter
 from pymongo import MongoClient
 from scrapy.http import HtmlResponse
-
+# pip install pillow
 
 class LeroyParserPipeline:
     def __init__(self):
@@ -16,9 +16,11 @@ class LeroyParserPipeline:
         self.db = self.client['leroy']
 
     def process_item(self, item, spider):
+
+        print(1)
         item['params_value'] = list(map(str.strip, item['params_value']))
         item['all_params'] = dict(zip(item['params_name'], item['params_value']))
-        print(1)
+
         del item['params_name'], item['params_value']
 
         return item
