@@ -6,8 +6,22 @@
 
 # useful for handling different item types with a single interface
 from itemadapter import ItemAdapter
+from pymongo import MongoClient
+from scrapy.http import HtmlResponse
 
 
 class LeroyParserPipeline:
+    def __init__(self):
+        self.client = MongoClient('localhost:27017')
+        self.db = self.client['leroy']
+
     def process_item(self, item, spider):
+        item['params_value'] = list(map(str.strip, item['params_value']))
+        item['all_params'] = dict(zip(item['params_name'], item['params_value']))
+        print(1)
+        del item['params_name'], item['params_value']
+
         return item
+
+
+from scrapy.pipelines.images import ImagesPipeline
